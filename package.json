@@ -2,10 +2,15 @@
   "name": "pokemon-website",
   "version": "1.0.0",
   "description": "Personal website with pokemon style astetic",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Kevin Jung",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "browserify": "^17.0.0",
+    "typescript": "^5.0.2",
+    "watchify": "^4.0.0"
+  }
 }
