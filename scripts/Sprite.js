@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 class Sprite {
     constructor({ position, velocity, image, ctx }) {
         this.position = position;
@@ -7,6 +8,7 @@ class Sprite {
         this.ctx = ctx;
     }
     draw() {
-        this.ctx.drawImage(this.image, this.position.x, this.position.y);
+        this.ctx.drawImage(this.image, this.position.x + window.innerWidth / 2, this.position.y + window.innerHeight / 2);
     }
 }
+exports.default = Sprite;

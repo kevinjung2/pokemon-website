@@ -4,13 +4,13 @@
   "description": "Personal website with pokemon style astetic",
   "main": "index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "compile": "tsc; browserify scripts/index.js scripts/Sprite.js scripts/collisions.js scripts/Boundary.js -o bundle/bundle.js "
   },
   "author": "Kevin Jung",
   "license": "ISC",
   "devDependencies": {
     "browserify": "^17.0.0",
-    "typescript": "^5.0.2",
-    "watchify": "^4.0.0"
+    "typescript": "^5.0.2"
   }
 }

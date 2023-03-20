@@ -13,6 +13,6 @@ export default class Sprite{
     }
 
     draw() {
-        this.ctx.drawImage(this.image, this.position.x, this.position.y)
+        this.ctx.drawImage(this.image, this.position.x + window.innerWidth/2, this.position.y + window.innerHeight/2)
     }
 }

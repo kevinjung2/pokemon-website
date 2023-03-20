@@ -106,9 +106,12 @@
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
     "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
   },
-  "files": [
-    "./types/index.d.ts",
-    "./scripts/index.ts",
-    "./scripts/Sprite.ts"
-  ]
+  // "files": [
+  //   "./types/index.d.ts",
+  //   "./scripts/index.ts",
+  //   "./scripts/Sprite.ts",
+  //   "./scripts/collisions.ts",
+  //   "./scripts/Boundary.ts"
+  // ]
+  "include": ["types/*.ts", "scripts/*.ts"]
 }
