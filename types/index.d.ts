@@ -3,10 +3,15 @@ interface Position {
     y: number
 }
 
+interface Frames {
+    max     :number,
+}
+
 interface SpriteParams {
     position :Position, 
     velocity :number, 
-    image    :CanvasImageSource, 
+    image    :HTMLImageElement,
+    frames?   :Frames, 
     ctx      :CanvasRenderingContext2D
 }
 

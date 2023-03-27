@@ -4,12 +4,14 @@ class Boundary {
     constructor({ position, ctx }) {
         this.position = position;
         this.ctx = ctx;
-        this.width = 48;
-        this.height = 48;
+        this.width = 54;
+        this.height = 54;
     }
     draw() {
         this.ctx.fillStyle = "red";
         this.ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
     }
 }
+Boundary.width = 54;
+Boundary.height = 54;
 exports.default = Boundary;

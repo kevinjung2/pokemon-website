@@ -2,16 +2,39 @@ import Sprite from "./Sprite"
 import { collisions } from "./collisions"
 import Boundary from "./Boundary"
 
+interface SpritePair {
+    rect1: Sprite,
+    rect2: Boundary
+}
+
 const canvas    :HTMLCanvasElement          = document.getElementById("canvas") as HTMLCanvasElement
 const ctx       :CanvasRenderingContext2D   = canvas.getContext('2d')!
+Sprite.canvasHeight = canvas.height
 
-const startCoords       :number[] = [-3000, -1600]
-let position            :number[] = startCoords
+const offset    :Position = {x:-3000 + window.innerWidth/2, y:-1600 + window.innerHeight/2}
+let position    :Position = offset
 
-const backgroundImage   :CanvasImageSource  = new Image()
-const playerImage       :CanvasImageSource  = new Image()
+const backgroundImage   :HTMLImageElement  = new Image()
+const playerImage       :HTMLImageElement  = new Image()
+
+canvas.width = window.innerWidth
+canvas.height = window.innerHeight
+
+backgroundImage.src = "./img/pokemon-map.png"
+playerImage.src = "./img/playerDown.png"
+
+const player            :Sprite             = new Sprite({
+    position: {
+        x: canvas.width/2 - 192 / 4 / 2,
+        y: canvas.height / 2 - 68 / 2
+    },
+    velocity: 0,
+    image: playerImage,
+    frames: {max: 4},
+    ctx: ctx
+})
 const background        :Sprite             = new Sprite({
-    position: {x: position[0], y: position[1]},
+    position: position,
     velocity: 0,
     image: backgroundImage,
     ctx: ctx
@@ -32,34 +55,38 @@ for(let i = 0; i < collisions.length; i += 70){
 
 collisionsMap.forEach((row, i) => {
     row.forEach((symbol, j) => {
-        boundaries.push(new Boundary({position: {x:j*48, y:i*48}, ctx: ctx}))
+        symbol === 1025 && boundaries.push(new Boundary({position: {x:j*Boundary.width + offset.x, y:i*Boundary.height + offset.y}, ctx: ctx}))
     })
 })
 
-canvas.width = window.innerWidth
-canvas.height = window.innerHeight
+const movables      : any[] = [background, ...boundaries]
 
-backgroundImage.src = "./img/pokemon-map.png"
-playerImage.src = "./img/playerDown.png"
+function rectangularCollision({ rect1, rect2}: SpritePair): boolean{
 
+    return(
+        rect1.position.x + rect1.width >= rect2.position.x &&
+        rect1.position.x <= rect2.position.x + rect2.width &&
+        rect1.position.y <= rect2.position.y + rect2.height &&
+        rect1.position.y + rect1.height >= rect2.position.y
+    )
+}
+let i = 0
 
 function draw(){
     window.requestAnimationFrame(draw)
     background.draw()
-    ctx.drawImage(playerImage, 
-        0,
-        0,
-        playerImage.width as number/4,
-        playerImage.height as number,
-        canvas.width/2 - (playerImage.width as number)/8, 
-        canvas.height/2 - (playerImage.height as number)/2,
-        (playerImage.width as number)/4,
-        (playerImage.height as number)
-    )
-    movement.up && (background.position.y += 3)
-    movement.down && (background.position.y -= 3)
-    movement.left && (background.position.x += 3)
-    movement.right && (background.position.x -= 3)
+    boundaries.forEach(boundary => {
+        boundary.draw()
+        if(rectangularCollision({rect1: player, rect2: boundary})){
+            console.log("colliding")
+        }
+    })
+    player.draw()
+
+    movement.up && (movables.forEach(movable => {movable.position.y += 3}))
+    movement.down && (movables.forEach(movable => {movable.position.y -= 3}))
+    movement.left && (movables.forEach(movable => {movable.position.x += 3}))
+    movement.right && (movables.forEach(movable => {movable.position.x -= 3}))
 
 }
 

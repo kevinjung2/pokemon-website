@@ -1,14 +1,16 @@
 export default class Boundary {
     public position : Position
     private ctx     : CanvasRenderingContext2D
-    readonly width   : number
-    readonly height  : number
+    static width    : number = 54
+    static height   : number = 54
+    public width    : number
+    public height   : number
 
     constructor({position, ctx}: BoundaryProps){
         this.position = position
         this.ctx = ctx
-        this.width = 48
-        this.height = 48
+        this.width = 54
+        this.height = 54
     }
 
     draw(){

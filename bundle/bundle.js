@@ -5,30 +5,44 @@ class Boundary {
     constructor({ position, ctx }) {
         this.position = position;
         this.ctx = ctx;
-        this.width = 48;
-        this.height = 48;
+        this.width = 54;
+        this.height = 54;
     }
     draw() {
         this.ctx.fillStyle = "red";
         this.ctx.fillRect(this.position.x, this.position.y, this.width, this.height);
     }
 }
+Boundary.width = 54;
+Boundary.height = 54;
 exports.default = Boundary;
 
 },{}],2:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Sprite {
-    constructor({ position, velocity, image, ctx }) {
+    constructor({ position, velocity, image, frames = { max: 1 }, ctx }) {
         this.position = position;
         this.velocity = velocity;
         this.image = image;
+        this.frames = frames;
         this.ctx = ctx;
+        this.width = this.image.width / this.frames.max;
+        this.height = this.image.height;
+        this.image.onload = () => {
+            this.width = this.image.width / this.frames.max;
+            this.height = this.image.height;
+        };
     }
     draw() {
-        this.ctx.drawImage(this.image, this.position.x + window.innerWidth / 2, this.position.y + window.innerHeight / 2);
+        if (this.width == 0 || this.height == 0) {
+            this.width = this.image.width / this.frames.max;
+            this.height = this.image.height;
+        }
+        this.ctx.drawImage(this.image, 0, 0, this.width, this.height, this.position.x, this.position.y, this.width, this.height);
     }
 }
+Sprite.canvasHeight = 0;
 exports.default = Sprite;
 
 },{}],3:[function(require,module,exports){
@@ -87,12 +101,27 @@ const collisions_1 = require("./collisions");
 const Boundary_1 = __importDefault(require("./Boundary"));
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext('2d');
-const startCoords = [-3000, -1600];
-let position = startCoords;
+Sprite_1.default.canvasHeight = canvas.height;
+const offset = { x: -3000 + window.innerWidth / 2, y: -1600 + window.innerHeight / 2 };
+let position = offset;
 const backgroundImage = new Image();
 const playerImage = new Image();
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+backgroundImage.src = "./img/pokemon-map.png";
+playerImage.src = "./img/playerDown.png";
+const player = new Sprite_1.default({
+    position: {
+        x: canvas.width / 2 - 192 / 4 / 2,
+        y: canvas.height / 2 - 68 / 2
+    },
+    velocity: 0,
+    image: playerImage,
+    frames: { max: 4 },
+    ctx: ctx
+});
 const background = new Sprite_1.default({
-    position: { x: position[0], y: position[1] },
+    position: position,
     velocity: 0,
     image: backgroundImage,
     ctx: ctx
@@ -110,21 +139,37 @@ for (let i = 0; i < collisions_1.collisions.length; i += 70) {
 }
 collisionsMap.forEach((row, i) => {
     row.forEach((symbol, j) => {
-        boundaries.push(new Boundary_1.default({ position: { x: j * 48, y: i * 48 }, ctx: ctx }));
+        symbol === 1025 && boundaries.push(new Boundary_1.default({ position: { x: j * Boundary_1.default.width + offset.x, y: i * Boundary_1.default.height + offset.y }, ctx: ctx }));
     });
 });
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-backgroundImage.src = "./img/pokemon-map.png";
-playerImage.src = "./img/playerDown.png";
+// let testBoundry = new Boundary({position: {x: 580, y: 270}, ctx: ctx})
+const movables = [background, ...boundaries];
+function rectangularCollision({ rect1, rect2 }) {
+    return (rect1.position.x + rect1.width >= rect2.position.x &&
+        rect1.position.x <= rect2.position.x + rect2.width &&
+        rect1.position.y <= rect2.position.y + rect2.height &&
+        rect1.position.y + rect1.height >= rect2.position.y);
+}
+let i = 0;
 function draw() {
     window.requestAnimationFrame(draw);
     background.draw();
-    ctx.drawImage(playerImage, 0, 0, playerImage.width / 4, playerImage.height, canvas.width / 2 - playerImage.width / 8, canvas.height / 2 - playerImage.height / 2, playerImage.width / 4, playerImage.height);
-    movement.up && (background.position.y += 3);
-    movement.down && (background.position.y -= 3);
-    movement.left && (background.position.x += 3);
-    movement.right && (background.position.x -= 3);
+    boundaries.forEach(boundary => {
+        boundary.draw();
+        if (rectangularCollision({ rect1: player, rect2: boundary })) {
+            console.log("colliding");
+        }
+    });
+    // testBoundry.draw()
+    player.draw();
+    // console.log(player.position.y, testBoundry.position.y + testBoundry.height)
+    // if (rectangularCollision({rect1: player, rect2: testBoundry})){
+    //     console.log("colliding")
+    // }
+    movement.up && (movables.forEach(movable => { movable.position.y += 3; }));
+    movement.down && (movables.forEach(movable => { movable.position.y -= 3; }));
+    movement.left && (movables.forEach(movable => { movable.position.x += 3; }));
+    movement.right && (movables.forEach(movable => { movable.position.x -= 3; }));
 }
 backgroundImage.onload = () => {
     draw();
